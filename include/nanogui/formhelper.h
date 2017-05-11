@@ -125,7 +125,7 @@ public:
     FormHelper(Screen *screen) : mScreen(screen) { }
 
     /// Add a new top-level window
-    Window *addWindow(const Vector2i &pos,
+    virtual Window *addWindow(const Vector2i &pos,
                          const std::string &title = "Untitled") {
         assert(mScreen);
         mWindow = new Window(mScreen, title);
@@ -138,9 +138,11 @@ public:
         return mWindow;
     }
 
+	virtual Widget *content() { return mWindow; }
+
     /// Add a new group that may contain several sub-widgets
     Label *addGroup(const std::string &caption) {
-        Label* label = new Label(mWindow, caption, mGroupFontName, mGroupFontSize);
+        Label* label = new Label(content(), caption, mGroupFontName, mGroupFontSize);
         if (mLayout->rowCount() > 0)
             mLayout->appendRow(mPreGroupSpacing); /* Spacing */
         mLayout->appendRow(0);
@@ -153,8 +155,8 @@ public:
     template <typename Type> detail::FormWidget<Type> *
     addVariable(const std::string &label, const std::function<void(const Type &)> &setter,
                 const std::function<Type()> &getter, bool editable = true) {
-        Label *labelW = new Label(mWindow, label, mLabelFontName, mLabelFontSize);
-        auto widget = new detail::FormWidget<Type>(mWindow);
+        Label *labelW = new Label(content(), label, mLabelFontName, mLabelFontSize);
+        auto widget = new detail::FormWidget<Type>(content());
         auto refresh = [widget, getter] {
             Type value = getter(), current = widget->value();
             if (value != current)
@@ -188,7 +190,7 @@ public:
 
     /// Add a button with a custom callback
     Button *addButton(const std::string &label, const std::function<void()> &cb) {
-        Button *button = new Button(mWindow, label);
+        Button *button = new Button(content(), label);
         button->setCallback(cb);
         button->setFixedHeight(25);
         if (mLayout->rowCount() > 0)
@@ -204,7 +206,7 @@ public:
         if (label == "") {
             mLayout->setAnchor(widget, AdvancedGridLayout::Anchor(1, mLayout->rowCount()-1, 3, 1));
         } else {
-            Label *labelW = new Label(mWindow, label, mLabelFontName, mLabelFontSize);
+            Label *labelW = new Label(content(), label, mLabelFontName, mLabelFontSize);
             mLayout->setAnchor(labelW, AdvancedGridLayout::Anchor(1, mLayout->rowCount()-1));
             mLayout->setAnchor(widget, AdvancedGridLayout::Anchor(3, mLayout->rowCount()-1));
         }
@@ -218,7 +220,7 @@ public:
 
     /// Access the currently active \ref Window instance
     Window *window() { return mWindow; }
-    void setWindow(Window *window) {
+    virtual void setWindow(Window *window) {
         mWindow = window;
         mLayout = dynamic_cast<AdvancedGridLayout *>(window->layout());
         if (mLayout == nullptr)
