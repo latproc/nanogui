@@ -132,7 +132,7 @@ public:
     void performLayout(NVGcontext* ctx) override;
     void draw(NVGcontext* ctx) override;
 
-private:
+protected:
     // Helper image methods.
     void updateImageParameters();
 
