@@ -181,7 +181,7 @@ public:
     void updateFocus(Widget *widget);
     void disposeWindow(Window *window);
     void centerWindow(Window *window);
-    void moveWindowToFront(Window *window);
+    virtual void moveWindowToFront(Window *window);
     void drawWidgets();
 
 protected:
