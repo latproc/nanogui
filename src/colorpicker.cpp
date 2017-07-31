@@ -45,6 +45,9 @@ ColorPicker::ColorPicker(Widget *parent, const Color& color) : PopupButton(paren
     });
 }
 
+ColorPicker::~ColorPicker() {
+}
+
 Color ColorPicker::color() const {
     return backgroundColor();
 }
