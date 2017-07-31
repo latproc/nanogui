@@ -20,7 +20,7 @@ std::string file_dialog(const std::vector<std::pair<std::string, std::string>> &
         NSOpenPanel *openDlg = [[NSOpenPanel openPanel] retain];
 
         [openDlg setCanChooseFiles:YES];
-        [openDlg setCanChooseDirectories:NO];
+        [openDlg setCanChooseDirectories:YES];
         [openDlg setAllowsMultipleSelection:NO];
         NSMutableArray *types = [NSMutableArray new];
         for (size_t idx = 0; idx < filetypes.size(); ++idx)
