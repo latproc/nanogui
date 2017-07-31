@@ -35,7 +35,8 @@ public:
         Left,
         LeftCentered,
         RightCentered,
-        Right
+        Right,
+        Filled
     };
 
     Button(Widget *parent, const std::string &caption = "Untitled", int icon = 0);

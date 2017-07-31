@@ -87,13 +87,17 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
             }
             if (mFlags & ToggleButton)
                 mPushed = !mPushed;
-            else
+            else {
                 mPushed = true;
+                //if (mChangeCallback) mChangeCallback(true);
+            }
         } else if (mPushed) {
             if (contains(p) && mCallback)
                 mCallback();
-            if (mFlags & NormalButton)
+            if (mFlags & NormalButton) {
                 mPushed = false;
+                //if (mChangeCallback) mChangeCallback(false);
+            }
         }
         if (pushedBackup != mPushed && mChangeCallback)
             mChangeCallback(mPushed);
@@ -170,16 +174,18 @@ void Button::draw(NVGcontext *ctx) {
         float iw, ih = fontSize;
         if (nvgIsFontIcon(mIcon)) {
             ih *= 1.5f;
+            if (mIconPosition == IconPosition::Filled) { ih=mSize.y(); }
             nvgFontSize(ctx, ih);
             nvgFontFace(ctx, "icons");
             iw = nvgTextBounds(ctx, 0, 0, icon.data(), nullptr, nullptr);
         } else {
             int w, h;
             ih *= 0.9f;
+            if (mIconPosition == IconPosition::Filled) { ih = mSize.y(); }
             nvgImageSize(ctx, mIcon, &w, &h);
             iw = w * ih / h;
         }
-        if (mCaption != "")
+        if (mIconPosition != IconPosition::Filled && mCaption != "")
             iw += mSize.y() * 0.15f;
         nvgFillColor(ctx, textColor);
         nvgTextAlign(ctx, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
@@ -196,6 +202,9 @@ void Button::draw(NVGcontext *ctx) {
             iconPos.x() = mPos.x() + 8;
         } else if (mIconPosition == IconPosition::Right) {
             iconPos.x() = mPos.x() + mSize.x() - iw - 8;
+        }
+        else if (mIconPosition == IconPosition::Filled) {
+            iconPos.x() = mPos.x(); iconPos.y() = mPos.y() + ih/2; // compensates for offset below
         }
 
         if (nvgIsFontIcon(mIcon)) {
