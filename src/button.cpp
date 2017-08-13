@@ -131,6 +131,9 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
               //std::cout << "button (normal) resetting state to not pushed\n";
                 mPushed = false;
             }
+            else if (mFlags == 0) {
+                mPushed = false;
+            }
         }
         if (pushedBackup != mPushed && mChangeCallback) {
             //std::cout << "button changed state so calling change callback " << mPushed << "\n";
