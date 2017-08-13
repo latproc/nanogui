@@ -27,7 +27,9 @@ public:
         NormalButton = (1 << 0), // 1
         RadioButton  = (1 << 1), // 2
         ToggleButton = (1 << 2), // 4
-        PopupButton  = (1 << 3)  // 8
+        PopupButton  = (1 << 3), // 8
+        SetOnButton  = (1 << 4),
+        SetOffButton = (1 << 5)
     };
 
     /// The available icon positions.

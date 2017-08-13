@@ -13,6 +13,7 @@
 #include <nanogui/theme.h>
 #include <nanogui/opengl.h>
 #include <nanogui/serializer/core.h>
+#include <iostream>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -54,53 +55,90 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
 
     if (button == GLFW_MOUSE_BUTTON_1 && mEnabled) {
         bool pushedBackup = mPushed;
+        //std::cout << "button push state was " << mPushed << "'\n";
         if (down) {
+            //std::cout << "button mouse down\n";
             if (mFlags & RadioButton) {
                 if (mButtonGroup.empty()) {
+                  //std::cout << "button radio empty group\n";
+
                     for (auto widget : parent()->children()) {
                         Button *b = dynamic_cast<Button *>(widget);
                         if (b != this && b && (b->flags() & RadioButton) && b->mPushed) {
+                          //std::cout << "button unpushing button " << b->caption() << "\n";
+
                             b->mPushed = false;
-                            if (b->mChangeCallback)
+                            if (b->mChangeCallback) {
+                                //std::cout << "button calling unpushed button change(false)\n";
                                 b->mChangeCallback(false);
+                            }
                         }
                     }
                 } else {
+                  //std::cout << "button radio in group\n";
                     for (auto b : mButtonGroup) {
                         if (b != this && (b->flags() & RadioButton) && b->mPushed) {
+                          //std::cout << "button unpushing button " << b->caption() << "\n";
+
                             b->mPushed = false;
-                            if (b->mChangeCallback)
+                            if (b->mChangeCallback) {
+                                //std::cout << "button calling unpushed button change(false)\n";
                                 b->mChangeCallback(false);
+                              }
                         }
                     }
                 }
             }
             if (mFlags & PopupButton) {
+              //std::cout << "button popup button\n";
+
                 for (auto widget : parent()->children()) {
                     Button *b = dynamic_cast<Button *>(widget);
                     if (b != this && b && (b->flags() & PopupButton) && b->mPushed) {
+                      //std::cout << "button unpushing button " << b->caption() << "\n";
+
                         b->mPushed = false;
-                        if (b->mChangeCallback)
+                        if (b->mChangeCallback) {
+                            //std::cout << "button calling unpushed button change(false)\n";
                             b->mChangeCallback(false);
+                          }
                     }
                 }
             }
-            if (mFlags & ToggleButton)
-                mPushed = !mPushed;
+            if (mFlags & SetOnButton || mFlags & SetOffButton) {
+                if (!mPushed) {
+                    mPushed = true;
+                    //std::cout << "set on/off button is now pushed\n";
+                }
+            }
             else {
-                mPushed = true;
-                //if (mChangeCallback) mChangeCallback(true);
+                if (mFlags & ToggleButton) {
+                    mPushed = !mPushed;
+                    //std::cout << "button toggled to " << mPushed << "\n";
+                }
+                else {
+                    mPushed = true;
+                    //std::cout << "button is now pushed\n";
+                }
             }
         } else if (mPushed) {
-            if (contains(p) && mCallback)
+            //std::cout << "button mouse up when pushed\n";
+            if (contains(p) && mCallback) {
+                //std::cout << "button calling its callback\n";
                 mCallback();
+            }
             if (mFlags & NormalButton) {
+              //std::cout << "button (normal) resetting state to not pushed\n";
                 mPushed = false;
-                //if (mChangeCallback) mChangeCallback(false);
             }
         }
-        if (pushedBackup != mPushed && mChangeCallback)
-            mChangeCallback(mPushed);
+        if (pushedBackup != mPushed && mChangeCallback) {
+            //std::cout << "button changed state so calling change callback " << mPushed << "\n";
+            if (mFlags & SetOffButton)
+                mChangeCallback(false);
+            else
+                mChangeCallback(mPushed);
+        }
 
         return true;
     }
