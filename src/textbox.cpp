@@ -35,6 +35,7 @@ TextBox::TextBox(Widget *parent,const std::string &value)
       mUnits(""),
       mFormat(""),
       mUnitsImage(-1),
+      mAutoSelectAll(true),
       mValidFormat(true),
       mValueTemp(value),
       mCursorPos(-1),
@@ -286,6 +287,12 @@ bool TextBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
     if (button == GLFW_MOUSE_BUTTON_1 && down && !mFocused) {
         if (!mSpinnable || spinArea(p) == SpinArea::None) /* not on scrolling arrows */
             requestFocus();
+        if (mAutoSelectAll) {
+            mSelectionPos = 0;
+            mCursorPos = (int) mValueTemp.size();
+            mMouseDownPos = Vector2i(-1, -1);
+            return true;
+        }
     }
 
     if (mEditable && focused()) {
@@ -294,7 +301,7 @@ bool TextBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
             mMouseDownModifier = modifiers;
 
             double time = glfwGetTime();
-            if (time - mLastClick < 0.25) {
+            if (mAutoSelectAll || time - mLastClick < 0.25) {
                 /* Double-click: select all text */
                 mSelectionPos = 0;
                 mCursorPos = (int) mValueTemp.size();
@@ -302,8 +309,10 @@ bool TextBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
             }
             mLastClick = time;
         } else {
-            mMouseDownPos = Vector2i(-1, -1);
-            mMouseDragPos = Vector2i(-1, -1);
+            if (!mAutoSelectAll) {
+                mMouseDownPos = Vector2i(-1, -1);
+                mMouseDragPos = Vector2i(-1, -1);
+            }
         }
         return true;
     } else if (mSpinnable && !focused()) {

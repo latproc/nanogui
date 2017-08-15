@@ -58,6 +58,9 @@ public:
     int unitsImage() const { return mUnitsImage; }
     void setUnitsImage(int image) { mUnitsImage = image; }
 
+    bool autoSelectAll() const { return mAutoSelectAll; }
+    void setAutoSelectAll( bool which) { mAutoSelectAll = which; }
+
     /// Return the underlying regular expression specifying valid formats
     const std::string &format() const { return mFormat; }
     /// Specify a regular expression specifying valid formats
@@ -108,6 +111,7 @@ protected:
     std::string mUnits;
     std::string mFormat;
     int mUnitsImage;
+    bool mAutoSelectAll;
     std::function<bool(const std::string& str)> mCallback;
     bool mValidFormat;
     std::string mValueTemp;
