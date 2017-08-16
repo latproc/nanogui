@@ -281,6 +281,12 @@ void TextBox::draw(NVGcontext* ctx) {
     nvgRestore(ctx);
 }
 
+void TextBox::selectAll() {
+    mSelectionPos = 0;
+    mCursorPos = (int) mValueTemp.size();
+    mMouseDownPos = Vector2i(-1, -1);
+}
+
 bool TextBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
                                int modifiers) {
 

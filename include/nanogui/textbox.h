@@ -60,6 +60,7 @@ public:
 
     bool autoSelectAll() const { return mAutoSelectAll; }
     void setAutoSelectAll( bool which) { mAutoSelectAll = which; }
+    void selectAll();
 
     /// Return the underlying regular expression specifying valid formats
     const std::string &format() const { return mFormat; }
