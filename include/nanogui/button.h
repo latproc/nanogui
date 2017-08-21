@@ -28,8 +28,9 @@ public:
         RadioButton  = (1 << 1), // 2
         ToggleButton = (1 << 2), // 4
         PopupButton  = (1 << 3), // 8
-        SetOnButton  = (1 << 4),
-        SetOffButton = (1 << 5)
+        SetOnButton  = (1 << 4), // 16
+        SetOffButton = (1 << 5), // 32
+        RemoteButton = (1 << 6)  // 64 - does not display feedback to mouse clicks
     };
 
     /// The available icon positions.
