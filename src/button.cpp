@@ -120,10 +120,14 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
                     mPushed = true;
                     //std::cout << "button is now pushed\n";
                 }
+               if (mFlags & RemoteButton && mCallback) {
+                    //std::cout << "button calling its callback\n";
+                    mCallback();
+                }
             }
         } else if (mPushed) {
             //std::cout << "button mouse up when pushed\n";
-            if (contains(p) && mCallback) {
+            if (contains(p) && mCallback && !(mFlags & RemoteButton)) {
                 //std::cout << "button calling its callback\n";
                 mCallback();
             }
@@ -135,14 +139,15 @@ bool Button::mouseButtonEvent(const Vector2i &p, int button, bool down, int modi
                 mPushed = false;
             }
         }
-        if (pushedBackup != mPushed && mChangeCallback) {
+        if (pushedBackup != mPushed && mChangeCallback && !(mFlags & RemoteButton)) {
             //std::cout << "button changed state so calling change callback " << mPushed << "\n";
             if (mFlags & SetOffButton)
                 mChangeCallback(false);
             else
                 mChangeCallback(mPushed);
         }
-
+        if (mFlags & RemoteButton)
+            mPushed = pushedBackup;
         return true;
     }
     return false;
