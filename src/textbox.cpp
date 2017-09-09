@@ -315,10 +315,8 @@ bool TextBox::mouseButtonEvent(const Vector2i &p, int button, bool down,
             }
             mLastClick = time;
         } else {
-            if (!mAutoSelectAll) {
-                mMouseDownPos = Vector2i(-1, -1);
-                mMouseDragPos = Vector2i(-1, -1);
-            }
+            mMouseDownPos = Vector2i(-1, -1);
+            mMouseDragPos = Vector2i(-1, -1);
         }
         return true;
     } else if (mSpinnable && !focused()) {
