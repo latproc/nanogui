@@ -263,20 +263,32 @@ void TextBox::draw(NVGcontext* ctx) {
 
                 // draw selection
                 nvgBeginPath(ctx);
-                nvgFillColor(ctx, nvgRGBA(255, 255, 255, 80));
+                nvgFillColor(ctx, nvgRGBA(255,255,255,255));
                 nvgRect(ctx, caretx, drawPos.y() - lineh * 0.5f, selx - caretx,
                         lineh);
                 nvgFill(ctx);
+								drawPos.x() = oldDrawPos.x() + mTextOffset;
+
+							  // redraw the text
+							  nvgFillColor(ctx, mEnabled && (!mCommitted || !mValue.empty()) ?
+													 mTheme->mTextColor :
+													 mTheme->mDisabledTextColor);
+
+								// draw text with offset
+								nvgText(ctx, drawPos.x(), drawPos.y(), mValueTemp.c_str(), nullptr);
+								nvgTextBounds(ctx, drawPos.x(), drawPos.y(), mValueTemp.c_str(),
+															nullptr, textBound);
+
             }
 
             float caretx = cursorIndex2Position(mCursorPos, textBound[2], glyphs, nglyphs);
 
             // draw cursor
             nvgBeginPath(ctx);
-            nvgMoveTo(ctx, caretx, drawPos.y() - lineh * 0.5f);
-            nvgLineTo(ctx, caretx, drawPos.y() + lineh * 0.5f);
-            nvgStrokeColor(ctx, nvgRGBA(255, 192, 0, 255));
-            nvgStrokeWidth(ctx, 1.0f);
+            nvgMoveTo(ctx, caretx, drawPos.y() - lineh * 0.7f);
+            nvgLineTo(ctx, caretx, drawPos.y() + lineh * 0.7f);
+            nvgStrokeColor(ctx, nvgRGBA(255, 255, 0, 255));
+            nvgStrokeWidth(ctx, 1.5f);
             nvgStroke(ctx);
         }
     }
