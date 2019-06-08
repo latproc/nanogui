@@ -1,5 +1,6 @@
 #include <nanogui/serializer/core.h>
 #include <iostream>
+#include <string>
 
 NAMESPACE_BEGIN(nanogui)
 
@@ -7,6 +8,11 @@ static const char *serialized_header_id = "SER_V1";
 static const int serialized_header_id_length = 6;
 static const int serialized_header_size =
     serialized_header_id_length + sizeof(uint64_t) + sizeof(uint32_t);
+
+// Added to the library to ensure the serializer class is not optimised out
+void dummy_func_instantiate_serializer() {
+  nanogui::detail::serialization_helper< std::string > serialStringHelper;
+}
 
 Serializer::Serializer(const std::string &filename, bool write_)
     : mFilename(filename), mWrite(write_), mCompatibility(false) {

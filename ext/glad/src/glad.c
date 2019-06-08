@@ -16,6 +16,9 @@
         http://glad.dav1d.de/#profile=core&language=c&specification=gl&api=gl%3D3.3
 */
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

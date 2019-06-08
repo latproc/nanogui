@@ -26,11 +26,11 @@
 #define __gl_h_
 
 #if !defined(APIENTRY)
-#  if defined(_WIN32)
-#    define APIENTRY _stdcall
-#  else
-#    define APIENTRY
-#  endif
+#if defined(_WIN32)
+#define APIENTRY __stdcall
+#else
+#define APIENTRY
+#endif
 #endif
 
 #ifndef APIENTRYP
@@ -50,7 +50,7 @@ typedef void* (* GLADloadproc)(const char *name);
 
 #ifndef GLAPI
 # if defined(GLAD_GLAPI_EXPORT)
-#  if defined(WIN32) || defined(__CYGWIN__)
+#  if defined(WIN32) || defined(__CYGWIN__) || defined(_WIN32)
 #   if defined(GLAD_GLAPI_EXPORT_BUILD)
 #    if defined(__GNUC__)
 #     define GLAPI __attribute__ ((dllexport)) extern
@@ -154,7 +154,7 @@ typedef uint64_t GLuint64EXT;
 typedef struct __GLsync *GLsync;
 struct _cl_context;
 struct _cl_event;
-typedef void (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
+typedef void (__stdcall *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 typedef void (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 typedef void (APIENTRY *GLDEBUGPROCKHR)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,const GLchar *message,void *userParam);

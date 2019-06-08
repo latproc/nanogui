@@ -12,19 +12,21 @@
 #include <nanogui/screen.h>
 
 #if defined(_WIN32)
-#  include <windows.h>
+  #include <windows.h>
+  #include <mingw.thread.h>
+#else
 #endif
 
 #include <nanogui/opengl.h>
 #include <map>
-#include <thread>
 #include <chrono>
 #include <iostream>
 
 #if !defined(_WIN32)
-#  include <locale.h>
-#  include <signal.h>
-#  include <sys/dir.h>
+  #include <thread>
+  #include <locale.h>
+  #include <signal.h>
+  #include <sys/dir.h>
 #endif
 
 NAMESPACE_BEGIN(nanogui)
@@ -339,4 +341,3 @@ void Object::decRef(bool dealloc) const noexcept {
 Object::~Object() { }
 
 NAMESPACE_END(nanogui)
-
