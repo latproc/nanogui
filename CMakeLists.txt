@@ -17,6 +17,8 @@ if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/src")
     "by calling \"git submodule update --init --recursive\"")
 endif()
 
+set (NANOGUI_BUILD ON)
+
 if (WIN32)
   set(NANOGUI_USE_GLAD_DEFAULT ON)
 else()
@@ -79,6 +81,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw" "ext_build/glfw")
+
 # Two targets have now been defined: `glfw_objects`, which will be merged into
 # NanoGUI at the end, and `glfw`.  The `glfw` target is the library itself
 # (e.g., libglfw.so), but can be skipped as we do not need to link against it
@@ -238,8 +241,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "BSD")
 endif()
 
 # Required core libraries on various platforms
+if (MINGW_BUILD)
+    list(APPEND NANOGUI_EXTRA_LIBS DruidOpenGL-Dep)
+endif()
 if (WIN32)
-  list(APPEND NANOGUI_EXTRA_LIBS opengl32)
+    list(APPEND NANOGUI_EXTRA_LIBS opengl32)
+    # list(APPEND NANOGUI_EXTRA_LIBS opengl32 glew32)
+
 elseif (APPLE)
   find_library(cocoa_library Cocoa)
   find_library(opengl_library OpenGL)
@@ -255,9 +263,20 @@ elseif(CMAKE_SYSTEM MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "BSD")
   if(CMAKE_SYSTEM MATCHES "Linux")
     list(APPEND NANOGUI_EXTRA_LIBS dl)
   endif()
+else()
+    message(FATAL_ERROR "err...")
 endif()
 
-include_directories(${NANOGUI_EIGEN_INCLUDE_DIR} ext/glfw/include ext/nanovg/src include ${CMAKE_CURRENT_BINARY_DIR})
+
+get_property(DruidOpenGL-Dep_INCLUDE_DIRS GLOBAL PROPERTY DruidOpenGL-Dep_INCLUDE_DIRS)
+# set(LIBRARY
+#     DruidOpenGL-Dep
+# )
+# set(INCLUDE
+#     ${DruidOpenGL-Dep_INCLUDE_DIRS}
+# )
+
+include_directories(${NANOGUI_EIGEN_INCLUDE_DIR} ext/glfw/include ext/nanovg/src include ${CMAKE_CURRENT_BINARY_DIR} ${DruidOpenGL-Dep_INCLUDE_DIRS})
 
 
 # Run simple cmake converter to put font files into the data segment
@@ -352,6 +371,10 @@ add_library(nanogui-obj OBJECT
   include/nanogui/serializer/sparse.h
   src/serializer.cpp
 )
+# if (MINGW_BUILD)
+#     target_link_libraries(nanogui-obj ${NANOGUI_EXTRA_LIBS})
+# endif()
+
 
 # XCode has a serious bug where the XCode project produces an invalid target
 # that will not get linked if it consists only of objects from object libraries,
@@ -388,6 +411,7 @@ endif()
 if (NANOGUI_BUILD_SHARED)
   target_link_libraries(nanogui ${NANOGUI_EXTRA_LIBS})
 endif()
+
 
 if (NANOGUI_INSTALL)
   install(TARGETS nanogui
@@ -428,6 +452,7 @@ if(NANOGUI_BUILD_EXAMPLE)
   add_executable(example3      src/example3.cpp)
   add_executable(example4      src/example4.cpp)
   add_executable(example_icons src/example_icons.cpp)
+  message("NANOIGUI EXTRA LIBS: nanogui ${NANOGUI_EXTRA_LIBS}")
   target_link_libraries(example1      nanogui ${NANOGUI_EXTRA_LIBS})
   target_link_libraries(example2      nanogui ${NANOGUI_EXTRA_LIBS})
   target_link_libraries(example3      nanogui ${NANOGUI_EXTRA_LIBS})
