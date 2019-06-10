@@ -31,7 +31,18 @@
 #endif
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-#include <GLFW/glfw3.h>
+// #include <GL/glew.h>
+// #include <GLFW/glfw3.h>
+// #include <GL/glext.h>
+// #include <GL/gl.h>
+#if MINGW_BUILD
+    #include <GL/glew.h>
+    #include <GLFW/glfw3.h>
+    #include <GL/glext.h>
+    #include <GL/gl.h>
+#else
+    #include <GLFW/glfw3.h>
+#endif
 #include <nanovg.h>
 
 // Special treatment of linux Nvidia opengl headers
