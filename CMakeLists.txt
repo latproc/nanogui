@@ -242,7 +242,7 @@ endif()
 
 # Required core libraries on various platforms
 if (MINGW_BUILD)
-    list(APPEND NANOGUI_EXTRA_LIBS DruidOpenGL-Dep)
+    list(APPEND NANOGUI_EXTRA_LIBS OpenGL-Dep)
 endif()
 if (WIN32)
     list(APPEND NANOGUI_EXTRA_LIBS opengl32)
@@ -268,15 +268,15 @@ else()
 endif()
 
 
-get_property(DruidOpenGL-Dep_INCLUDE_DIRS GLOBAL PROPERTY DruidOpenGL-Dep_INCLUDE_DIRS)
+get_property(OpenGL-Dep_INCLUDE_DIRS GLOBAL PROPERTY OpenGL-Dep_INCLUDE_DIRS)
 # set(LIBRARY
-#     DruidOpenGL-Dep
+#     OpenGL-Dep
 # )
 # set(INCLUDE
-#     ${DruidOpenGL-Dep_INCLUDE_DIRS}
+#     ${OpenGL-Dep_INCLUDE_DIRS}
 # )
 
-include_directories(${NANOGUI_EIGEN_INCLUDE_DIR} ext/glfw/include ext/nanovg/src include ${CMAKE_CURRENT_BINARY_DIR} ${DruidOpenGL-Dep_INCLUDE_DIRS})
+include_directories(${NANOGUI_EIGEN_INCLUDE_DIR} ext/glfw/include ext/nanovg/src include ${CMAKE_CURRENT_BINARY_DIR} ${OpenGL-Dep_INCLUDE_DIRS})
 
 
 # Run simple cmake converter to put font files into the data segment
