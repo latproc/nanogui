@@ -37,7 +37,7 @@
 // #include <GL/gl.h>
 #if MINGW_BUILD
     // #include <GL/glew.h>
-    // #include <dru_opengl_dep.hpp>
+    // #include <cw_opengl_dep.hpp>
     #include <GLFW/glfw3.h>
     #include <GL/glext.h>
     #include <GL/gl.h>
