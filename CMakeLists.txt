@@ -395,6 +395,15 @@ else()
     $<TARGET_OBJECTS:glfw_objects>
   )
 endif()
+target_include_directories(nanogui
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanovg/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/include
+)
+
 
 if (NANOGUI_BUILD_SHARED)
   set_property(TARGET nanogui-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
