@@ -101,7 +101,7 @@ int main(int /* argc */, char ** /* argv */) {
     // Create nanogui gui
     bool enabled = true;
     FormHelper *gui = new FormHelper(screen);
-    ref<Window> nanoguiWindow = gui->addWindow(Eigen::Vector2i(10, 10), "Form helper example");
+    ref<Window> nanoguiWindow = gui->addWindow(nanogui::Vector2i(10, 10), "Form helper example");
     gui->addGroup("Basic types");
     gui->addVariable("bool", bvar)->setTooltip("Test tooltip.");
     gui->addVariable("string", strval);

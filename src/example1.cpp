@@ -141,7 +141,7 @@ private:
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication() : nanogui::Screen(Eigen::Vector2i(1024, 768), "NanoGUI Test") {
+    ExampleApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "NanoGUI Test") {
         using namespace nanogui;
 
         Window *window = new Window(this, "Button demo");

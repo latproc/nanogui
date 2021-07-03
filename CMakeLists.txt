@@ -44,6 +44,8 @@ if(APPLE AND NANOGUI_BUILD_SHARED)
   set(CMAKE_MACOSX_RPATH ON)
 endif()
 
+set(CMAKE_CXX_STANDARD 14)
+
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceRuns)
 
@@ -134,6 +136,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|Intel)$")
     message(FATAL_ERROR "Unsupported compiler -- pybind11 requires C++11 support!")
   endif()
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-int-in-bool-context")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-objc-multiple-method-names")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-objc-multiple-method-names")
 
 # Various optimizations for shared library release builds
 if (NANOGUI_BUILD_SHARED)
