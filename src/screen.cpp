@@ -551,9 +551,11 @@ bool Screen::mouseButtonCallbackEvent(int button, int action, int modifiers) {
         auto dropWidget = findWidget(mMousePos);
         if (mDragActive && action == GLFW_RELEASE &&
             dropWidget != mDragWidget)
-            mDragWidget->mouseButtonEvent(
+            if (mDragWidget && mDragWidget->parent()) {
+                mDragWidget->mouseButtonEvent(
                 mMousePos - mDragWidget->parent()->absolutePosition(), button,
                 false, mModifiers);
+            }
 
         if (dropWidget != nullptr && dropWidget->cursor() != mCursor) {
             mCursor = dropWidget->cursor();
