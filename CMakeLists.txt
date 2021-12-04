@@ -75,7 +75,9 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 set(GLFW_USE_CHDIR OFF CACHE BOOL " " FORCE)
 set(BUILD_SHARED_LIBS ${NANOGUI_BUILD_SHARED} CACHE BOOL " " FORCE)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang"
+      OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   # Quench annoying deprecation warnings when compiling GLFW on OSX
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-warning-option")
