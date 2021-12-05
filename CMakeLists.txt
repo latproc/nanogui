@@ -11,7 +11,9 @@ if (POLICY CMP0058)
   cmake_policy(SET CMP0058 NEW)
 endif()
 cmake_policy(SET CMP0042 NEW)
-cmake_policy(SET CMP0077 NEW)
+if (POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
 
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/src")
   message(FATAL_ERROR "The NanoGUI dependency repositories (GLFW, etc.) are missing! "
