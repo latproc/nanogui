@@ -10,6 +10,8 @@ project("NanoGUI")
 if (POLICY CMP0058)
   cmake_policy(SET CMP0058 NEW)
 endif()
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0077 NEW)
 
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw/src")
   message(FATAL_ERROR "The NanoGUI dependency repositories (GLFW, etc.) are missing! "
@@ -23,11 +25,11 @@ else()
   set(NANOGUI_USE_GLAD_DEFAULT OFF)
 endif()
 
-option(NANOGUI_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
+option(NANOGUI_BUILD_EXAMPLE "Build NanoGUI example application?" OFF)
 option(NANOGUI_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
-option(NANOGUI_BUILD_PYTHON  "Build a Python plugin for NanoGUI?" ON)
+option(NANOGUI_BUILD_PYTHON  "Build a Python plugin for NanoGUI?" OFF)
 option(NANOGUI_USE_GLAD      "Use Glad OpenGL loader library?" ${NANOGUI_USE_GLAD_DEFAULT})
-option(NANOGUI_INSTALL       "Install NanoGUI on `make install`?" ON)
+option(NANOGUI_INSTALL       "Install NanoGUI on `make install`?" OFF)
 
 set(NANOGUI_PYTHON_VERSION "" CACHE STRING "Python version to use for compiling the Python plugin")
 
@@ -75,12 +77,16 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 set(GLFW_USE_CHDIR OFF CACHE BOOL " " FORCE)
 set(BUILD_SHARED_LIBS ${NANOGUI_BUILD_SHARED} CACHE BOOL " " FORCE)
 
+message(STATUS "CXX compiler ${CMAKE_CXX_COMPILER_ID}")
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang"
       OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
       OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  message(STATUS "using an Apple Clang")
   # Quench annoying deprecation warnings when compiling GLFW on OSX
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-warning-option")
+else()
+  message(STATUS "not using Apple Clang")
 endif()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw" "ext_build/glfw")
@@ -141,8 +147,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|Intel)$")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-int-in-bool-context")
+endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-objc-multiple-method-names")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-objc-multiple-method-names")
 
