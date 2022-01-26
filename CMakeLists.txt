@@ -87,18 +87,6 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 set(GLFW_USE_CHDIR OFF CACHE BOOL " " FORCE)
 set(BUILD_SHARED_LIBS ${NANOGUI_BUILD_SHARED} CACHE BOOL " " FORCE)
 
-message(STATUS "CXX compiler ${CMAKE_CXX_COMPILER_ID}")
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang"
-      OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  message(STATUS "using an Apple Clang")
-  # Quench annoying deprecation warnings when compiling GLFW on OSX
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-warning-option")
-else()
-  message(STATUS "not using Apple Clang")
-endif()
-
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw" "ext_build/glfw")
 # Two targets have now been defined: `glfw_objects`, which will be merged into
 # NanoGUI at the end, and `glfw`.  The `glfw` target is the library itself
@@ -142,6 +130,21 @@ if(MSVC)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
+
+message(STATUS "CXX compiler ${CMAKE_CXX_COMPILER_ID}")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang"
+      OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+      OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  message(STATUS "using an Apple Clang")
+  # Quench annoying deprecation warnings when compiling GLFW on OSX
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unknown-warning-option")
+  # Quench annoying deprecation warnings when compiling eigen on OSX
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")
+else()
+  message(STATUS "not using Apple Clang")
+endif()
+
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|Intel)$")
   CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
