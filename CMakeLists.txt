@@ -50,7 +50,15 @@ endif()
 
 set(CMAKE_CXX_STANDARD 14)
 
-include(CheckCXXCompilerFlag)
+#include(CheckCXXCompilerFlag)
+macro(CHECK_CXX_COMPILER_FLAG _CXX_FLAGS _RESULT)
+  set(CMAKE_REQUIRED_FLAGS ${_CXX_FLAGS})
+  set(CMAKE_REQUIRED_LIBRARIES ${_LINKER_FLAGS})
+  set(CMAKE_REQUIRED_QUIET TRUE)
+  check_cxx_source_runs("int main(int argc, char **argv) { return 0; }" ${_RESULT})
+  set(CMAKE_REQUIRED_FLAGS "")
+  set(CMAKE_REQUIRED_LIBRARIES "")
+endmacro()
 include(CheckCXXSourceRuns)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
