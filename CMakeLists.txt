@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.5)
 
 if (POLICY CMP0048)
   # cmake warns if loaded from a min-3.0-required parent dir, so silence the warning:
@@ -27,7 +27,7 @@ option(NANOGUI_BUILD_EXAMPLE "Build NanoGUI example application?" ON)
 option(NANOGUI_BUILD_SHARED  "Build NanoGUI as a shared library?" ON)
 option(NANOGUI_BUILD_PYTHON  "Build a Python plugin for NanoGUI?" ON)
 option(NANOGUI_USE_GLAD      "Use Glad OpenGL loader library?" ${NANOGUI_USE_GLAD_DEFAULT})
-option(NANOGUI_INSTALL       "Install NanoGUI on `make install`?" ON)
+option(NANOGUI_INSTALL       "Install NanoGUI on `make install`?" OFF)
 
 set(NANOGUI_PYTHON_VERSION "" CACHE STRING "Python version to use for compiling the Python plugin")
 
@@ -289,7 +289,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} ARGS ${bin2c_cmdline}
   DEPENDS ${resources}
   COMMENT "Running bin2c"
-  PRE_BUILD VERBATIM)
+)
 
 # Needed to generated files
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
