@@ -274,8 +274,8 @@ std::pair<Vector2i, Vector2i> TabHeader::activeButtonArea() const {
                                  [](int acc, const TabButton& tb) {
         return acc + tb.size().x();
     });
-    auto topLeft = mPos + Vector2i(width, 0);
-    auto bottomRight = mPos + Vector2i(width + activeIterator()->size().x(), mSize.y());
+    Vector2i topLeft = mPos + Vector2i(width, 0);
+    Vector2i bottomRight = mPos + Vector2i(width + activeIterator()->size().x(), mSize.y());
     return { topLeft, bottomRight };
 }
 
