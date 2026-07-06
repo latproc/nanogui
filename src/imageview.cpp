@@ -17,6 +17,13 @@
 #include <nanogui/theme.h>
 #include <cmath>
 
+#if !defined(GL_TEXTURE_WIDTH)
+#define GL_TEXTURE_WIDTH  0x1000
+#endif
+#if !defined(GL_TEXTURE_HEIGHT)
+#define GL_TEXTURE_HEIGHT 0x1001
+#endif
+
 NAMESPACE_BEGIN(nanogui)
 
 namespace {
@@ -319,12 +326,13 @@ void ImageView::draw(NVGcontext* ctx) {
 }
 
 void ImageView::updateImageParameters() {
-    // Query the width of the OpenGL texture.
+#if !defined(NANOGUI_GLES)
     glBindTexture(GL_TEXTURE_2D, mImageID);
     GLint w, h;
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
     mImageSize = Vector2i(w, h);
+#endif
 }
 
 void ImageView::drawWidgetBorder(NVGcontext* ctx) const {

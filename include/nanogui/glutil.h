@@ -25,6 +25,11 @@ namespace half_float { class half; }
     #define GL_HALF_FLOAT 0x140B
 #endif
 
+#if !defined(GL_DOUBLE) || defined(DOXYGEN_DOCUMENTATION_BUILD)
+    /// OpenGL ES does not support double-precision vertex attributes.
+    #define GL_DOUBLE 0x140A
+#endif
+
 NAMESPACE_BEGIN(nanogui)
 
 // bypass template specializations
@@ -82,7 +87,10 @@ public:
 
     /// Create an unitialized OpenGL shader
     GLShader()
-        : mVertexShader(0), mFragmentShader(0), mGeometryShader(0),
+        : mVertexShader(0), mFragmentShader(0),
+#if !defined(NANOGUI_GLES)
+          mGeometryShader(0),
+#endif
           mProgramShader(0), mVertexArrayObject(0) { }
 
     /**
@@ -365,7 +373,9 @@ protected:
     GLuint mFragmentShader;
 
     /// The geometry shader (if requested) of this GLShader (as returned by ``glCreateShader``).
+#if !defined(NANOGUI_GLES)
     GLuint mGeometryShader;
+#endif
 
     /// The OpenGL program (as returned by ``glCreateProgram``).
     GLuint mProgramShader;

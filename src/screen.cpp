@@ -32,7 +32,11 @@
 #endif
 
 /* Allow enforcing the GL2 implementation of NanoVG */
+#if defined(NANOGUI_GLES)
+#define NANOVG_GLES3_IMPLEMENTATION
+#else
 #define NANOVG_GL3_IMPLEMENTATION
+#endif
 #include <nanovg_gl.h>
 
 NAMESPACE_BEGIN(nanogui)
@@ -118,12 +122,22 @@ Screen::Screen(const Vector2i &size, const std::string &caption, bool resizable,
       mShutdownGLFWOnDestruct(false), mFullscreen(fullscreen) {
     memset(mCursors, 0, sizeof(GLFWcursor *) * (int) Cursor::CursorCount);
 
-    /* Request a forward compatible OpenGL glMajor.glMinor core profile context.
-       Default value is an OpenGL 3.3 core profile context. */
+    /* Request an OpenGL context. Default value is an OpenGL 3.3 core profile
+       context. For GLES builds, an OpenGL ES 3.0 context is created instead. */
+#if defined(NANOGUI_GLES)
+    /* Clamp to GLES 3.0 by default since GLES 3.3 does not exist */
+    if (glMajor == 3 && glMinor == 3) {
+        glMinor = 0;
+    }
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMajor);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
+#else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMajor);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinor);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
     glfwWindowHint(GLFW_SAMPLES, nSamples);
     glfwWindowHint(GLFW_RED_BITS, colorBits);
@@ -321,7 +335,11 @@ void Screen::initialize(GLFWwindow *window, bool shutdownGLFWOnDestruct) {
     flags |= NVG_DEBUG;
 #endif
 
+#if defined(NANOGUI_GLES)
+    mNVGContext = nvgCreateGLES3(flags);
+#else
     mNVGContext = nvgCreateGL3(flags);
+#endif
     if (mNVGContext == nullptr)
         throw std::runtime_error("Could not initialize NanoVG!");
 
@@ -349,7 +367,11 @@ Screen::~Screen() {
             glfwDestroyCursor(mCursors[i]);
     }
     if (mNVGContext)
+#if defined(NANOGUI_GLES)
+        nvgDeleteGLES3(mNVGContext);
+#else
         nvgDeleteGL3(mNVGContext);
+#endif
     if (mGLFWWindow && mShutdownGLFWOnDestruct)
         glfwDestroyWindow(mGLFWWindow);
 }

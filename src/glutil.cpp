@@ -53,8 +53,10 @@ static GLuint createShader_helper(GLint type, const std::string &name,
             std::cerr << "vertex shader";
         else if (type == GL_FRAGMENT_SHADER)
             std::cerr << "fragment shader";
+#if !defined(NANOGUI_GLES)
         else if (type == GL_GEOMETRY_SHADER)
             std::cerr << "geometry shader";
+#endif
         std::cerr << " \"" << name << "\":" << std::endl;
         std::cerr << shader_string << std::endl << std::endl;
         glGetShaderInfoLog(id, 512, nullptr, buffer);
@@ -96,23 +98,29 @@ bool GLShader::init(const std::string &name,
     mName = name;
     mVertexShader =
         createShader_helper(GL_VERTEX_SHADER, name, defines, vertex_str);
+#if !defined(NANOGUI_GLES)
     mGeometryShader =
         createShader_helper(GL_GEOMETRY_SHADER, name, defines, geometry_str);
+#endif
     mFragmentShader =
         createShader_helper(GL_FRAGMENT_SHADER, name, defines, fragment_str);
 
     if (!mVertexShader || !mFragmentShader)
         return false;
+#if !defined(NANOGUI_GLES)
     if (!geometry_str.empty() && !mGeometryShader)
         return false;
+#endif
 
     mProgramShader = glCreateProgram();
 
     glAttachShader(mProgramShader, mVertexShader);
     glAttachShader(mProgramShader, mFragmentShader);
 
+#if !defined(NANOGUI_GLES)
     if (mGeometryShader)
         glAttachShader(mProgramShader, mGeometryShader);
+#endif
 
     glLinkProgram(mProgramShader);
 
@@ -219,10 +227,30 @@ void GLShader::downloadAttrib(const std::string &name, size_t size, int /* dim *
 
     if (name == "indices") {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf.id);
+#if defined(NANOGUI_GLES)
+        {
+            void *mapped = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, (GLsizeiptr)totalSize, GL_MAP_READ_BIT);
+            if (mapped) {
+                memcpy(data, mapped, totalSize);
+                glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+            }
+        }
+#else
         glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, totalSize, data);
+#endif
     } else {
         glBindBuffer(GL_ARRAY_BUFFER, buf.id);
+#if defined(NANOGUI_GLES)
+        {
+            void *mapped = glMapBufferRange(GL_ARRAY_BUFFER, 0, (GLsizeiptr)totalSize, GL_MAP_READ_BIT);
+            if (mapped) {
+                memcpy(data, mapped, totalSize);
+                glUnmapBuffer(GL_ARRAY_BUFFER);
+            }
+        }
+#else
         glGetBufferSubData(GL_ARRAY_BUFFER, 0, totalSize, data);
+#endif
     }
 }
 
@@ -293,7 +321,9 @@ void GLShader::free() {
     glDeleteProgram(mProgramShader); mProgramShader = 0;
     glDeleteShader(mVertexShader);   mVertexShader = 0;
     glDeleteShader(mFragmentShader); mFragmentShader = 0;
+#if !defined(NANOGUI_GLES)
     glDeleteShader(mGeometryShader); mGeometryShader = 0;
+#endif
 }
 
 const GLShader::Buffer &GLShader::attribBuffer(const std::string &name) {
@@ -360,8 +390,10 @@ void GLFramebuffer::init(const Vector2i &size, int nSamples) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepth);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepth);
 
+#if !defined(NANOGUI_GLES)
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
+#endif
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -378,20 +410,26 @@ void GLFramebuffer::free() {
 
 void GLFramebuffer::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
+#if !defined(NANOGUI_GLES)
     if (mSamples > 1)
         glEnable(GL_MULTISAMPLE);
+#endif
 }
 
 void GLFramebuffer::release() {
+#if !defined(NANOGUI_GLES)
     if (mSamples > 1)
         glDisable(GL_MULTISAMPLE);
+#endif
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GLFramebuffer::blit() {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#if !defined(NANOGUI_GLES)
     glDrawBuffer(GL_BACK);
+#endif
 
     glBlitFramebuffer(0, 0, mSize.x(), mSize.y(), 0, 0, mSize.x(), mSize.y(),
                       GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
@@ -407,7 +445,17 @@ void GLFramebuffer::downloadTGA(const std::string &filename) {
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFramebuffer);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+#if defined(NANOGUI_GLES)
+    glReadPixels(0, 0, mSize.x(), mSize.y(), GL_RGBA, GL_UNSIGNED_BYTE, temp);
+    // Swap R and B channels for TGA output (GLES doesn't support GL_BGRA)
+    for (int i = 0; i < mSize.prod() * 4; i += 4) {
+        uint8_t t = temp[i];
+        temp[i] = temp[i + 2];
+        temp[i + 2] = t;
+    }
+#else
     glReadPixels(0, 0, mSize.x(), mSize.y(), GL_BGRA, GL_UNSIGNED_BYTE, temp);
+#endif
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
     uint32_t rowSize = mSize.x() * 4;
