@@ -76,17 +76,20 @@ set(GLFW_INSTALL OFF CACHE BOOL " " FORCE)
 set(GLFW_USE_CHDIR OFF CACHE BOOL " " FORCE)
 set(BUILD_SHARED_LIBS ${NANOGUI_BUILD_SHARED} CACHE BOOL " " FORCE)
 
+# GLFW 3.4 replaced this single-backend option with GLFW_BUILD_WAYLAND and
+# GLFW_BUILD_X11.  Remove the stale cache key so existing build trees upgrade.
+if (DEFINED GLFW_USE_WAYLAND)
+  unset(GLFW_USE_WAYLAND CACHE)
+endif()
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Quench annoying deprecation warnings when compiling GLFW on OSX
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-deprecated-declarations")
 endif()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw" "ext_build/glfw")
-# Two targets have now been defined: `glfw_objects`, which will be merged into
-# NanoGUI at the end, and `glfw`.  The `glfw` target is the library itself
-# (e.g., libglfw.so), but can be skipped as we do not need to link against it
-# (because we merge `glfw_objects` into NanoGUI).  Skipping is required for
-# XCode, but preferable for all build systems (reduces build artifacts).
+# GLFW is linked as a regular dependency so its modern Wayland backend can be
+# built alongside X11 and selected by GLFW at runtime.
 set_target_properties(glfw PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 
 # Python support: add NANOGUI_PYTHON flag to all targets
@@ -381,12 +384,10 @@ if (CMAKE_GENERATOR STREQUAL Xcode)
   add_library(nanogui ${NANOGUI_LIBRARY_TYPE}
     ${XCODE_DUMMY}
     $<TARGET_OBJECTS:nanogui-obj>
-    $<TARGET_OBJECTS:glfw_objects>
   )
 else()
   add_library(nanogui ${NANOGUI_LIBRARY_TYPE}
     $<TARGET_OBJECTS:nanogui-obj>
-    $<TARGET_OBJECTS:glfw_objects>
   )
 endif()
 
@@ -402,9 +403,7 @@ if (NANOGUI_USE_GLAD AND NANOGUI_BUILD_SHARED)
     "GLAD_GLAPI_EXPORT;GLAD_GLAPI_EXPORT_BUILD")
 endif()
 
-if (NANOGUI_BUILD_SHARED)
-  target_link_libraries(nanogui ${NANOGUI_EXTRA_LIBS})
-endif()
+target_link_libraries(nanogui PUBLIC glfw ${NANOGUI_EXTRA_LIBS})
 
 if (NANOGUI_INSTALL)
   install(TARGETS nanogui
@@ -416,8 +415,7 @@ if (NANOGUI_INSTALL)
 endif()
 
 if (NANOGUI_BUILD_SHARED)
-  # When GLFW is merged into the NanoGUI library, this flag must be specified
-  set_property(TARGET nanogui-obj APPEND PROPERTY COMPILE_DEFINITIONS "_GLFW_BUILD_DLL;NVG_SHARED")
+  set_property(TARGET nanogui-obj APPEND PROPERTY COMPILE_DEFINITIONS "NVG_SHARED")
 endif()
 
 if (NANOGUI_BUILD_SHARED AND NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEB)
@@ -474,7 +472,6 @@ endif()
 if (NANOGUI_BUILD_PYTHON)
   # Need PIC code in libnanogui even when compiled as a static library
   set_target_properties(nanogui-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  set_target_properties(glfw_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
   include_directories("ext/pybind11/include" ${PYTHON_INCLUDE_DIR})
   add_library(nanogui-python-obj OBJECT
