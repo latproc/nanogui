@@ -16,6 +16,7 @@
 #include <nanogui/screen.h>
 #include <nanogui/theme.h>
 #include <cmath>
+#include <cassert>
 
 #if !defined(GL_TEXTURE_WIDTH)
 #define GL_TEXTURE_WIDTH  0x1000
